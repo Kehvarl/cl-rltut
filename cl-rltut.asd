@@ -1,9 +1,9 @@
 ;;;; cl-rltut.asd
 
 (asdf:defsystem #:cl-rltut
-  :description "Describe cl-rltut here"
-  :author "KEHVARL"
-  :license  "Specify license here"
+  :description "Common Lisp Roguelike Tutorial featuring BearLibTerminal"
+  :author "Kehvarl"
+  :license  "MIT"
   :version "0.0.1"
   :serial t
   :depends-on (#:cl-blt)
