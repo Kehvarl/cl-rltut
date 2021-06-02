@@ -10,6 +10,12 @@
 	(blt:cell-char player-x player-y) #\@)
   (blt:refresh))
 
+(defun handle-key ()
+  (blt:key-case (blt:read)
+		(:close ())
+		(:escape ())))
+		
+
 (defun config ()
   (blt:set "window.resizeable = true")
   (blt:set "window.size = ~Ax~A" *screen-width* *screen-height*)
