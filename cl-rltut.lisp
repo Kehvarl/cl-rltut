@@ -4,10 +4,10 @@
 (defparameter *screen-width* 80)
 (defparameter *screen-height* 50)
 
-(defun draw ()
+(defun draw (player-x player-y)
   (blt:clear)
   (setf (blt:color) (blt:white)
-	(blt:cell-char 10 10) #\@)
+	(blt:cell-char player-x player-y) #\@)
   (blt:refresh))
 
 (defun config ()
@@ -19,7 +19,7 @@
   (blt:with-terminal
     (config)
     (loop :do
-      (draw)
+      (draw 10 15)
       (blt:key-case (blt:read)
 		    (:escape (return))
 		    (:close (return))))))
