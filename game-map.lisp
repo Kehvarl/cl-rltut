@@ -23,3 +23,13 @@
   (declare (ignore initargs))
   (setf (game-map/tiles map) (make-array (list (game-map/w map) (game-map/h map)))))
 
+(defun initialize-tiles ((map game-map))
+  (dotimes (y (game-map/h map))
+    (dotimes (x (game-map/w map))
+      (setf (aref (game-map/tiles map) x y) (make-instance 'tile))))
+  (setf (tile/blocked (aref (game-map/tiles map) 30 22)) t)
+  (setf (tile/block-sight (aref (game-map/tiles map) 30 22)) t)
+  (setf (tile/blocked (aref (game-map/tiles map) 31 22)) t)
+  (setf (tile/block-sight (aref (game-map/tiles map) 31 22)) t)
+  (setf (tile/blocked (aref (game-map/tiles map) 32 22)) t)
+  (setf (tile/block-sight (aref (game-map/tiles map) 32 22)) t))
