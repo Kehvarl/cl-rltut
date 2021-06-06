@@ -82,5 +82,8 @@
 	       (if exit
 		   (return))
 	       (when move
-		 (move player (car move) (cdr move)))))))
+		 (unless (blocked-p *map*
+				    (+ (entity/x player) (car move))
+				    (+ (entity/y player) (cdr move)))
+		   (move player (car move) (cdr move))))))))
 
