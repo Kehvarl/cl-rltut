@@ -9,4 +9,4 @@
   :depends-on (#:cl-blt)
   :components ((:file "package")
                (:file "cl-rltut")
-	       (:file "game-map"))
+	       (:file "game-map")))

@@ -8,7 +8,7 @@
 		:accessor tile/block-sight
 		:initform nil)))
 
-(defmethoc initialize-instance :after ((tile tile) &rest initargs)
+(defmethod initialize-instance :after ((tile tile) &rest initargs)
   (declare (ignore initargs))
   (with-slots (blocked block-sight) tile
     (if (null block-sight)
@@ -23,10 +23,12 @@
   (declare (ignore initargs))
   (setf (game-map/tiles map) (make-array (list (game-map/w map) (game-map/h map)))))
 
-(defun initialize-tiles ((map game-map))
+(defun initialize-tiles (map)
+  (declare (type game-map map))
   (dotimes (y (game-map/h map))
     (dotimes (x (game-map/w map))
       (setf (aref (game-map/tiles map) x y) (make-instance 'tile))))
+
   (setf (tile/blocked (aref (game-map/tiles map) 30 22)) t)
   (setf (tile/block-sight (aref (game-map/tiles map) 30 22)) t)
   (setf (tile/blocked (aref (game-map/tiles map) 31 22)) t)
