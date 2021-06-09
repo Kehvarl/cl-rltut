@@ -17,11 +17,12 @@
 (defclass game-map ()
   ((width :initarg :w :accessor game-map/w)
    (height :initarg :h :accessor game-map/h)
-   (times :accessor game-map/tiles)))
+   (tiles :accessor game-map/tiles)))
 
-(defmethod initialize-instance :after ((map game-map) &rest initargs)
-  (declare (ignore initargs))
-  (setf (game-map/tiles map) (make-array (list (game-map/w map) (game-map/h map)))))
+(defmethod initialize-instance :after ((map game-map) &key (initial-blocked-value t))
+  (setf (game-map/tiles map) (make-array (list (game-map/w map) (game-map/h map))))
+  (map-tiles-loop (map tile :col-val x :row-val y)
+    (setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked initial-blocked-value))))
 
 (defmethod blocked-p ((map game-map) x y)
   (tile/blocked (aref (game-map/tiles map) x y)))
