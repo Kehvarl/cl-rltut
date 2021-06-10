@@ -6,7 +6,9 @@
 (defparameter *map-width* 80)
 (defparameter *map-height* 45)
 
-(defparameter *map* nil)
+(defparameter *room-max-size* 10)
+(defparameter *room-min-size* 6)
+(defparameter *max-rooms* 30)
 
 (defparameter *color-map* (list :dark-wall (blt:rgba 0 0 100)
 				:dark-ground (blt:rgba 50 50 150)))
@@ -86,7 +88,7 @@
 			      :color (blt:yellow)))
 	  (entities (list player npc))
 	  (map (make-instance 'game-map :w *map-width* :h *map-height*)))
-      (make-map map)
+      (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player)
 
       (do ((exit nil (game-tick player entities map)))
 	  (exit)))))
