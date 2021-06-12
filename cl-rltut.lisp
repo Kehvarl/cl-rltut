@@ -11,7 +11,9 @@
 (defparameter *max-rooms* 30)
 
 (defparameter *color-map* (list :dark-wall (blt:rgba 0 0 100)
-				:dark-ground (blt:rgba 50 50 150)))
+				:dark-ground (blt:rgba 50 50 150)
+				:light-wall (blt:rgba 130 110 50)
+				:light-ground (blt:rgba 200 180 50)))
 
 (defclass entity ()
   ((x :initarg :x :accessor entity/x)
@@ -23,10 +25,12 @@
   (incf (entity/x e) dx)
   (incf (entity/y e) dy))
 
-(defmethod draw ((e entity))
+(defmethod draw ((e entity) (map game-map))
   (with-slots (x y char color) e
-    (setf (blt:color) color
-	  (blt:cell-char x y) char)))
+    (if (tile/visible (aref (game-map/tiles map) x y))
+	(setf (blt:background-color) (blt:cell-background-color x y)
+	      (blt:color) color
+	      (blt:cell-char x y) char))))
 
 (defun handle-keys ()
   (let ((action nil))
@@ -44,14 +48,19 @@
   (dotimes (y (game-map/h map))
     (dotimes (x (game-map/w map))
       (let* ((tile (aref (game-map/tiles map) x y))
-	     (wall (tile/blocked tile)))
-	(if wall
-	    (setf (blt:background-color) (getf *color-map* :dark-wall))
-	    (setf (blt:background-color) (getf *color-map* :dark-ground))))
-      (setf (blt:cell-char x y) #\Space)))
-
-  (mapc #'draw entities)
-
+	     (wall (tile/blocked tile))
+	     (visible (tile/visible tile)))
+	(cond (visible
+	       (if wall
+		   (setf (blt:background-color) (getf *color-map* :light-wall))
+		   (setf (blt:background-color) (getf *color-map* :light-ground)))
+	       (setf (blt:cell-char x y) #\Space))
+	      (t
+	       (if wall
+		   (setf (blt:background-color) (getf *color-map* :dark-wall))
+		   (setf (blt:background-color) (getf *color-map* :dark-ground)))
+	       (setf (blt:cell-char x y) #\Space))))))
+  (mapc #'(lambda (entity) (draw entity map)) entities)
   (setf (blt:background-color) (blt:black))
   (blt:refresh))
 
@@ -77,18 +86,19 @@
   (blt:with-terminal
     (config)
     (let* ((player (make-instance 'entity
-				 :x (/ *screen-width* 2)
-				 :y (/ *screen-height* 2)
-				 :char #\@
-				 :color (blt:white)))
-	  (npc (make-instance 'entity
-			      :x (- (/ *screen-width* 2) 5)
-			      :y (/ *screen-height* 2)
-			      :char #\@
-			      :color (blt:yellow)))
-	  (entities (list player npc))
-	  (map (make-instance 'game-map :w *map-width* :h *map-height*)))
+				  :x (/ *screen-width* 2)
+				  :y (/ *screen-height* 2)
+				  :char #\@
+				  :color (blt:white)))
+	   (npc (make-instance 'entity
+			       :x (- (/ *screen-width* 2) 5)
+			       :y (/ *screen-height* 2)
+			       :char #\@
+			       :color (blt:yellow)))
+	   (entities (list player npc))
+	   (map (make-instance 'game-map :w *map-width* :h *map-height*)))
       (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player)
-
+      (fov map (entity/x player) (entity/y player))
+      	   
       (do ((exit nil (game-tick player entities map)))
 	  (exit)))))
