@@ -49,13 +49,14 @@
     (dotimes (x (game-map/w map))
       (let* ((tile (aref (game-map/tiles map) x y))
 	     (wall (tile/blocked tile))
-	     (visible (tile/visible tile)))
+	     (visible (tile/visible tile))
+	     (explored (tile/explored tile)))
 	(cond (visible
 	       (if wall
 		   (setf (blt:background-color) (getf *color-map* :light-wall))
 		   (setf (blt:background-color) (getf *color-map* :light-ground)))
 	       (setf (blt:cell-char x y) #\Space))
-	      (t
+	      (explored
 	       (if wall
 		   (setf (blt:background-color) (getf *color-map* :dark-wall))
 		   (setf (blt:background-color) (getf *color-map* :dark-ground)))
@@ -78,7 +79,8 @@
       (unless (blocked-p map
 			 (+ (entity/x player) (car move))
 			 (+ (entity/y player) (cdr move)))
-	(move player (car move) (cdr move))))
+	(move player (car move) (cdr move))
+	(fov map (entity/x player) (entity/y player))))
     exit))
 
 
@@ -99,6 +101,6 @@
 	   (map (make-instance 'game-map :w *map-width* :h *map-height*)))
       (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player)
       (fov map (entity/x player) (entity/y player))
-      	   
+  
       (do ((exit nil (game-tick player entities map)))
 	  (exit)))))
