@@ -58,6 +58,13 @@
 	     (= (entity/y entity) y))
 	(return entity))))
 
+(defun blocking-entity-at (entities x y)
+  (dolist (entity entities)
+    (if (and (= (entity/x entity) x)
+	     (= (entity/y entity) y)
+	     (entity/blocks entity))
+	(return  entity))))
+
 (defclass rect ()
   ((x1 :initarg :x1 :accessor rect/x1)
    (x2 :initarg :x2 :accessor rect/x2)
@@ -113,8 +120,8 @@
 	    (y (+ (random (round (/ (- (rect/y2 room) (rect/y1 room) 1) 2))) (1+ (rect/y1 room)))))
 	(unless (entity-at entities x y)
 	  (if (< (random 100) 80)
-	      (nconc entities (list (make-instance 'entity :x x :y y :color (blt:green) :char #\o)))
-	      (nconc entities (list (make-instance 'entity :x x :y y :color (blt:yellow) :char #\T)))))))))
+	      (nconc entities (list (make-instance 'entity :name "Orc" :x x :y y :color (blt:green) :char #\o :blocks t)))
+	      (nconc entities (list (make-instance 'entity :name "Troll" :x x :y y :color (blt:yellow) :char #\T :blocks t)))))))))
 
 (defmethod make-map ((map game-map) max-rooms room-min-size room-max-size map-width map-height player entities max-entities-per-room)
   (do* ((rooms nil)
