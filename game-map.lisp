@@ -1,31 +1,5 @@
 (in-package #:cl-rltut)
 
-(defclass tile ()
-  ((blocked :initarg :blocked
-	    :accessor tile/blocked
-	    :initform nil)
-   (block-sight :initarg :block-sight
-		:accessor tile/block-sight
-		:initform nil)
-   (visible :initarg :visible
-	    :accessor tile/visible
-	    :initform nil)
-   (explored :initarg :explored
-	     :accessor tile/explored
-	     :initform nil)))
-
-(defmethod initialize-instance :after ((tile tile) &rest initargs)
-  (declare (ignore initargs))
-  (with-slots (blocked block-sight) tile
-    (if (null block-sight)
-	(setf block-sight blocked))))
-
-(defmethod set-tile-slots ((tile tile) &key (blocked nil blocked-supplied-p) (block-sight nil block-sight-supplied-p))
-  (if blocked-supplied-p
-      (setf (slot-value tile 'blocked) blocked))
-  (if block-sight-supplied-p
-      (setf (slot-value tile 'block-sight) block-sight)))
-
 (defclass game-map ()
   ((width :initarg :w :accessor game-map/w)
    (height :initarg :h :accessor game-map/h)
@@ -65,32 +39,6 @@
 	     (entity/blocks entity))
 	(return  entity))))
 
-(defclass rect ()
-  ((x1 :initarg :x1 :accessor rect/x1)
-   (x2 :initarg :x2 :accessor rect/x2)
-   (y1 :initarg :y1 :accessor rect/y1)
-   (y2 :initarg :y2 :accessor rect/y2)))
-
-(defmethod initialize-instance :after ((rect rect) &key x y w h)
-  (with-slots (x1 x2 y1 y2) rect
-    (setf x1 x
-	  y1 y
-	  x2 (+ x w)
-	  y2 (+ y h))))
-
-(defmethod center ((rect rect))
-  (with-slots (x1 x2 y1 y2) rect
-    (let ((center-x (round (/ (+ x1 x2) 2)))
-	  (center-y (round (/ (+ y1 y2) 2))))
-      (values center-x center-y))))
-
-(defmethod intersect ((rect rect) (other rect))
-  "Returns T if this RECT intersects with OTHER"
-  (and (<= (rect/x1 rect) (rect/x2 other))
-       (<= (rect/x2 rect) (rect/x1 other))
-       (<= (rect/y1 rect) (rect/y2 other))
-       (<= (rect/y2 rect) (rect/y1 other))))
-
 (defmethod create-room ((map game-map) (room rect))
   (map-tiles-loop (map tile
 		   :x-start (1+ (rect/x1 room)) :x-end (rect/x2 room)
@@ -116,8 +64,8 @@
 (defmethod place-entities ((map game-map) (room rect) entities max-entities-per-room)
   (let ((num-monsters (random max-entities-per-room)))
     (dotimes (monster-index num-monsters)
-      (let ((x (+ (random (round (/ (- (rect/x2 room) (rect/x1 room) 1) 2))) (1+ (rect/x1 room))))
-	    (y (+ (random (round (/ (- (rect/y2 room) (rect/y1 room) 1) 2))) (1+ (rect/y1 room)))))
+      (let ((x (random-x room))
+	    (y (random-y room)))
 	(unless (entity-at entities x y)
 	  (if (< (random 100) 80)
 	      (nconc entities (list (make-instance 'entity :name "Orc" :x x :y y :color (blt:green) :char #\o :blocks t)))
