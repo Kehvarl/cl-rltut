@@ -9,5 +9,7 @@
   :depends-on (#:cl-blt)
   :components ((:file "package")
                (:file "cl-rltut")
+	       (:file "tile")
+	       (:file "rect")
 	       (:file "game-map")
-	       (:file "fov"))
+	       (:file "fov")))
