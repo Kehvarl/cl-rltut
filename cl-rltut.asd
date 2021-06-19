@@ -8,8 +8,11 @@
   :serial t
   :depends-on (#:cl-blt)
   :components ((:file "package")
-               (:file "cl-rltut")
+               (:file "entity")
 	       (:file "tile")
 	       (:file "rect")
+	       (:file "math")	       
+	       (:file "fov")
 	       (:file "game-map")
-	       (:file "fov")))
+	       (:file "cl-rltut")
+	       ))
