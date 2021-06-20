@@ -5,7 +5,11 @@
    (height :initarg :h :accessor game-map/h)
    (tiles :accessor game-map/tiles)))
 
-(defmacro map-tiles-loop ((map tile-val &key (row-val (gensym)) (col-val (gensym)) (x-start 0) (y-start 0) (x-end nil) (y-end nil)) &body body)
+(defmacro map-tiles-loop ((map tile-val &key (row-val (gensym))
+                                          (col-val (gensym))
+                                          (x-start 0) (y-start 0)
+                                          (x-end nil) (y-end nil))
+                          &body body)
   `(loop :for ,col-val :from ,x-start :below (if (null ,x-end) (game-map/w ,map) ,x-end)
 	 :do
 	    (loop :for ,row-val :from ,y-start :below (if (null ,y-end) (game-map/h ,map) ,y-end)
@@ -68,10 +72,17 @@
 	    (y (random-y room)))
 	(unless (entity-at entities x y)
 	  (if (< (random 100) 80)
-	      (nconc entities (list (make-instance 'entity :name "Orc" :x x :y y :color (blt:green) :char #\o :blocks t)))
-	      (nconc entities (list (make-instance 'entity :name "Troll" :x x :y y :color (blt:yellow) :char #\T :blocks t)))))))))
+	      (nconc entities (list (make-instance 'entity :name "Orc"
+                                                     :x x :y y :color (blt:green)
+                                                     :char #\o :blocks t)))
+	      (nconc entities (list (make-instance 'entity :name "Troll"
+                                                     :x x :y y :color (blt:yellow)
+                                                     :char #\T :blocks t)))))))))
 
-(defmethod make-map ((map game-map) max-rooms room-min-size room-max-size map-width map-height player entities max-entities-per-room)
+(defmethod make-map ((map game-map) max-rooms room-min-size room-max-size
+                     map-width map-height
+                     player entities
+                     max-entities-per-room)
   (do* ((rooms nil)
 	(num-rooms 0)
 	(room-index 0 (1+ room-index))
