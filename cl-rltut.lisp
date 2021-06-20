@@ -18,14 +18,6 @@
 
 (deftype game-states () '(member :player-turn :enemy-turn :exit))
 
-(defclass entity ()
-  ((name :initarg :name :accessor entity/name)
-   (x :initarg :x :accessor entity/x)
-   (y :initarg :y :accessor entity/y)
-   (char :initarg :char :accessor entity/char)
-   (color :initarg :color :accessor entity/color)
-   (blocks :initarg :blocks :accessor entity/blocks)))
-
 (defmethod move ((e entity) dx dy)
   (incf (entity/x e) dx)
   (incf (entity/y e) dy))
@@ -94,7 +86,7 @@
 	    (setf game-state :enemy-turn))))
     (when exit
       (setf game-state :exit)))
-  
+
   (when (eql game-state :enemy-turn)
     (dolist (entity entities)
       (if (not (eql player entity))
@@ -102,7 +94,6 @@
     (setf game-state :player-turn))
 
   game-state)
-
 
 (defun main ()
   (blt:with-terminal
@@ -118,6 +109,6 @@
 	   (map (make-instance 'game-map :w *map-width* :h *map-height*)))
       (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player entities *max-enemies-per-room*)
       (fov map (entity/x player) (entity/y player))
-  
+
       (do ((game-state :player-turn (game-tick player entities map game-state)))
 	  ((eql game-state :exit))))))
