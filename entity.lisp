@@ -7,7 +7,17 @@
    (y :initarg :y :accessor entity/y)
    (char :initarg :char :accessor entity/char)
    (color :initarg :color :accessor entity/color)
-   (blocks :initarg :blocks :accessor entity/blocks)))
+   (blocks :initarg :blocks :accessor entity/blocks)
+   (fighter :initarg :fighter :accessor entity/fighter :initform nil)
+   (ai :initarg :ai :accessor entity/ai :initform nil)))
+
+(defmethod initialize-instance :after ((entity entity) #rest initargs)
+  (declare (ignore initargs))
+  (with-slots (fighter ai) entity
+    (when fighter
+      (setf (component/owner fighter) entity))
+    (when ai
+      (setf (component/owner ai) entity))))
 
 (defmethod move ((e entity) dx dy)
   (incf (entity/x e) dx)
