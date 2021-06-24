@@ -15,5 +15,6 @@
                (:file "math")
 	             (:file "fov")
                (:file "components")
+               (:file "ai")
 	             (:file "cl-rltut")
 	             ))
