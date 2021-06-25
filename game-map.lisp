@@ -10,18 +10,25 @@
                                           (x-start 0) (y-start 0)
                                           (x-end nil) (y-end nil))
                           &body body)
-  `(loop :for ,col-val :from ,x-start :below (if (null ,x-end) (game-map/w ,map) ,x-end)
+  `(loop :for ,col-val
+         :from ,x-start
+           :below (if (null ,x-end) (game-map/w ,map) ,x-end)
 	 :do
-	    (loop :for ,row-val :from ,y-start :below (if (null ,y-end) (game-map/h ,map) ,y-end)
+	    (loop :for ,row-val
+            :from ,y-start
+              :below (if (null ,y-end) (game-map/h ,map) ,y-end)
 		  :do
 		     (let ((,tile-val (aref (game-map/tiles ,map) ,col-val ,row-val)))
 		       (declare (ignorable ,tile-val))
 		       ,@body))))
 
-(defmethod initialize-instance :after ((map game-map) &key (initial-blocked-value t))
-  (setf (game-map/tiles map) (make-array (list (game-map/w map) (game-map/h map))))
+(defmethod initialize-instance :after ((map game-map)
+                                       &key (initial-blocked-value t))
+  (setf (game-map/tiles map) (make-array (list (game-map/w map)
+                                               (game-map/h map))))
   (map-tiles-loop (map tile :col-val x :row-val y)
-    (setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked initial-blocked-value))))
+                  (setf (aref (game-map/tiles map) x y)
+                        (make-instance 'tile :blocked initial-blocked-value))))
 
 (defmethod blocked-p ((map game-map) x y)
   (tile/blocked (aref (game-map/tiles map) x y)))
@@ -65,19 +72,39 @@
 		     :y-start start-y :y-end (1+ end-y))
       (set-tile-slots tile :blocked nil :block-sight nil))))
 
-(defmethod place-entities ((map game-map) (room rect) entities max-entities-per-room)
+(defmethod place-entities ((map game-map)
+                           (room rect)
+                           entities
+                           max-entities-per-room)
   (let ((num-monsters (random max-entities-per-room)))
     (dotimes (monster-index num-monsters)
       (let ((x (random-x room))
 	    (y (random-y room)))
 	(unless (entity-at entities x y)
-	  (if (< (random 100) 80)
-	      (nconc entities (list (make-instance 'entity :name "Orc"
-                                                     :x x :y y :color (blt:green)
-                                                     :char #\o :blocks t)))
-	      (nconc entities (list (make-instance 'entity :name "Troll"
-                                                     :x x :y y :color (blt:yellow)
-                                                     :char #\T :blocks t)))))))))
+	  (cond ((< (random 100) 80)
+        (let* ((fighter-component (make-instance 'fighter
+                                                 :hp 10
+                                                 :defense 0
+                                                 :attack 3))
+               (ai-component (make-instance 'basic-monster))
+               (orc (make-instance 'entity :name "Orc"
+                                           :x x :y y :color (blt:green)
+                                           :char #\o :blocks t
+                                           :fighter fighter-component
+                                           :ai ai-component)))
+          (nconc entities (list orc))))
+          (t
+           (let* ((fighter-component (make-instance 'fighter
+                                                    :hp 16
+                                                    :defense 1
+                                                    :attack 4))
+                  (ai-component (make-instance 'basic-monster))
+                  (troll (make-instance 'entity :name "Troll"
+                                                :x x :y y :color (blt:yellow)
+                                                :char #\T :blocks t
+                                                :fighter fighter-component
+                                                :ai ai-component)))
+             (nconc entities (list troll))))))))))
 
 (defmethod make-map ((map game-map) max-rooms room-min-size room-max-size
                      map-width map-height

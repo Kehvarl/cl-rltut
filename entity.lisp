@@ -11,7 +11,7 @@
    (fighter :initarg :fighter :accessor entity/fighter :initform nil)
    (ai :initarg :ai :accessor entity/ai :initform nil)))
 
-(defmethod initialize-instance :after ((entity entity) #rest initargs)
+(defmethod initialize-instance :after ((entity entity) &rest initargs)
   (declare (ignore initargs))
   (with-slots (fighter ai) entity
     (when fighter
