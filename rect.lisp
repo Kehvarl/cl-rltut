@@ -9,14 +9,14 @@
 (defmethod initialize-instance :after ((rect rect) &key x y w h)
   (with-slots (x1 x2 y1 y2) rect
     (setf x1 x
-	  y1 y
-	  x2 (+ x w)
-	  y2 (+ y h))))
+     y1 y
+     x2 (+ x w)
+     y2 (+ y h))))
 
 (defmethod center ((rect rect))
   (with-slots (x1 x2 y1 y2) rect
     (let ((center-x (round (/ (+ x1 x2) 2)))
-	  (center-y (round (/ (+ y1 y2) 2))))
+          (center-y (round (/ (+ y1 y2) 2))))
       (values center-x center-y))))
 
 (defmethod intersect ((rect rect) (other rect))
@@ -28,8 +28,8 @@
 
 (defmethod random-x ((rect rect))
   (with-slots (x1 x2) rect
-  (+ (random (round (/ (- x2 x1 1) 2))) (1+ x1))))
+   (+ (random (round (/ (- x2 x1 1) 2))) (1+ x1))))
 
 (defmethod random-y ((rect rect))
   (with-slots (y1 y2) rect
-  (+ (random (round (/ (- y2 y1 1) 2))) (1+ y1))))
+   (+ (random (round (/ (- y2 y1 1) 2))) (1+ y1))))

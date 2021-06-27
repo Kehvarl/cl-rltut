@@ -26,6 +26,6 @@
 (defmethod draw ((e entity) (map game-map))
   (with-slots (x y char color) e
     (if (tile/visible (aref (game-map/tiles map) x y))
-	(setf (blt:background-color) (blt:cell-background-color x y)
-	      (blt:color) color
-	      (blt:cell-char x y) char))))
+     (setf (blt:background-color) (blt:cell-background-color x y)
+            (blt:color) color
+            (blt:cell-char x y) char))))
