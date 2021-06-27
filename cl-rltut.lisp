@@ -12,9 +12,9 @@
 (defparameter *max-enemies-per-room* 5)
 
 (defparameter *color-map* (list :dark-wall (blt:rgba 0 0 100)
-				:dark-ground (blt:rgba 50 50 150)
-				:light-wall (blt:rgba 130 110 50)
-				:light-ground (blt:rgba 200 180 50)))
+                                :dark-ground (blt:rgba 50 50 150)
+                                :light-wall (blt:rgba 130 110 50)
+                                :light-ground (blt:rgba 200 180 50)))
 
 (deftype game-states () '(member :player-turn :enemy-turn :exit))
 
@@ -25,39 +25,39 @@
 (defmethod draw ((e entity) (map game-map))
   (with-slots (x y char color) e
     (if (tile/visible (aref (game-map/tiles map) x y))
-	(setf (blt:background-color) (blt:cell-background-color x y)
-	      (blt:color) color
-	      (blt:cell-char x y) char))))
+     (setf (blt:background-color) (blt:cell-background-color x y)
+            (blt:color) color
+            (blt:cell-char x y) char))))
 
 (defun handle-keys ()
   (let ((action nil))
     (blt:key-case (blt:read)
-		  (:up (setf action (list :move (cons 0 -1))))
-		  (:down (setf action (list :move (cons 0 1))))
-		  (:left (setf action (list :move (cons -1 0))))
-		  (:right (setf action (list :move (cons 1 0))))
-		  (:close (setf action (list :quit t)))
-		  (:escape (setf action (list :quit t))))
-    action)) 
+      (:up (setf action (list :move (cons 0 -1))))
+      (:down (setf action (list :move (cons 0 1))))
+      (:left (setf action (list :move (cons -1 0))))
+      (:right (setf action (list :move (cons 1 0))))
+      (:close (setf action (list :quit t)))
+      (:escape (setf action (list :quit t))))
+    action))
 
 (defun render-all (entities map)
   (blt:clear)
   (dotimes (y (game-map/h map))
     (dotimes (x (game-map/w map))
       (let* ((tile (aref (game-map/tiles map) x y))
-	     (wall (tile/blocked tile))
-	     (visible (tile/visible tile))
-	     (explored (tile/explored tile)))
-	(cond (visible
-	       (if wall
-		   (setf (blt:background-color) (getf *color-map* :light-wall))
-		   (setf (blt:background-color) (getf *color-map* :light-ground)))
-	       (setf (blt:cell-char x y) #\Space))
-	      (explored
-	       (if wall
-		   (setf (blt:background-color) (getf *color-map* :dark-wall))
-		   (setf (blt:background-color) (getf *color-map* :dark-ground)))
-	       (setf (blt:cell-char x y) #\Space))))))
+             (wall (tile/blocked tile))
+             (visible (tile/visible tile))
+             (explored (tile/explored tile)))
+       (cond (visible
+               (if wall
+                (setf (blt:background-color) (getf *color-map* :light-wall))
+                (setf (blt:background-color) (getf *color-map* :light-ground)))
+               (setf (blt:cell-char x y) #\Space))
+             (explored
+               (if wall
+                (setf (blt:background-color) (getf *color-map* :dark-wall))
+                (setf (blt:background-color) (getf *color-map* :dark-ground)))
+               (setf (blt:cell-char x y) #\Space))))))
   (mapc #'(lambda (entity) (draw entity map)) entities)
   (setf (blt:background-color) (blt:black))
   (blt:refresh))
@@ -71,19 +71,19 @@
   (declare (type game-states game-state))
   (render-all entities map)
   (let* ((action (handle-keys))
-	 (move (getf action :move))
-	 (exit (getf action :quit)))
+         (move (getf action :move))
+         (exit (getf action :quit)))
     (when (and move (eql game-state :player-turn))
       (let ((destination-x (+ (entity/x player) (car move)))
-	    (destination-y  (+ (entity/y player) (cdr move))))
-	(unless (blocked-p map destination-x destination-y)
-	  (let ((target (blocking-entity-at entities destination-x destination-y)))
-		(cond (target
-		       (format t "You kick the ~A.~%" (entity/name target)))
-		      (t
-		       (move player (car move) (cdr move))
-		       (fov map (entity/x player) (entity/y player)))))
-	    (setf game-state :enemy-turn))))
+            (destination-y  (+ (entity/y player) (cdr move))))
+       (unless (blocked-p map destination-x destination-y)
+          (let ((target (blocking-entity-at entities destination-x destination-y)))
+           (cond (target
+                    (format t "You kick the ~A.~%" (entity/name target)))
+                 (t
+                    (move player (car move) (cdr move))
+                    (fov map (entity/x player) (entity/y player)))))
+          (setf game-state :enemy-turn))))
     (when exit
       (setf game-state :exit)))
 
@@ -98,21 +98,21 @@
   (blt:with-terminal
     (config)
     (let* ((fighter-component (make-instance 'fighter
-					     :hp 30
-					     :defense 2
-					     :attack 5))
-	   (player (make-instance 'entity
-				  :name "Player"
-				  :x (/ *screen-width* 2)
-				  :y (/ *screen-height* 2)
-				  :char #\@
-				  :color (blt:white)
-				  :blocks t
-				  :fighter fighter-component))
-	   (entities (list player))
-	   (map (make-instance 'game-map :w *map-width* :h *map-height*)))
+                               :hp 30
+                               :defense 2
+                               :attack 5))
+           (player (make-instance 'entity
+                    :name "Player"
+                    :x (/ *screen-width* 2)
+                    :y (/ *screen-height* 2)
+                    :char #\@
+                    :color (blt:white)
+                    :blocks t
+                    :fighter fighter-component))
+           (entities (list player))
+           (map (make-instance 'game-map :w *map-width* :h *map-height*)))
       (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player entities *max-enemies-per-room*)
       (fov map (entity/x player) (entity/y player))
 
       (do ((game-state :player-turn (game-tick player entities map game-state)))
-	  ((eql game-state :exit))))))
+       ((eql game-state :exit))))))
