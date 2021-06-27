@@ -26,7 +26,7 @@
     ;; if tile is a wall, mark as seen and stop the line early
           (when (tile/block-sight (aref (game-map/tiles map) tx ty))
              (setf (tile/visible (aref (game-map/tiles map) tx ty)) t
-              (tile/explored (aref (game-map/tiles map) tx ty)) t)
+              (tile/explored (aref (game-map/tiles map) tx ty)) t) 
              (return))
 
           (setf (tile/visible (aref (game-map/tiles map) tx ty)) t
