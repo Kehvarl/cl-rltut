@@ -4,12 +4,18 @@
 
 (defmethod take-turn ((component basic-monster) target map entities)
   (let* ((monster (component/owner component))
-         (in-sight (tile/visible (aref (game-map/tiles map) (entity/x monster) (entity/y monster)))))
+         (in-sight (tile/visible (aref (game-map/tiles map)
+                                       (entity/x monster)
+                                       (entity/y monster)))))
     (when in-sight
       (cond ((>= (distance-to monster target) 2)
-             (move-towards monster (entity/x target) (entity/y target) map entities))
+             (move-towards monster
+                           (entity/x target)
+                           (entity/y target)
+                           map entities))
             ((> (fighter/hp (entity/fighter target)) 0)
-             (format t "The ~A insults you! Your ego is damaged!~%" (entity/name monster)))))))
+             (format t "The ~A insults you! Your ego is damaged!~%"
+                     (entity/name monster)))))))
 
 (defgeneric move-towards (e target-x targey-y map entities))
 
