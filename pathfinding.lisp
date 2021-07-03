@@ -1,10 +1,10 @@
-(:in-package :cl-rltut)
+(in-package :cl-rltut)
 
 (defparameter *all-directions*
   (list (cons 0 -1)
         (cons 0 1)
         (cons -1 0)
-        (const 1 0)))
+        (cons 1 0)))
 
 (defclass node ()
   ((g :initform 0 :accessor node/g)
@@ -36,3 +36,62 @@ with the same position, it will return the LAST one it finds."
                                   (setf node item)))
                       queue)
     node))
+
+(defun create-path (current-node)
+  "Given a node, return a list of all parent nodes leading to it."
+  (do ((path nil)
+       (current current-node (node/parent current)))
+    ((null current) (reverse path))
+    (setf path (append path (list (node/position current))))))
+
+(defun make-node (parent-node node-x node-y direction-from-parent)
+  "Creates a NODE instance with the given PARENT, NODE-C and NODE-Y, and
+calculates the DISTANCE-FROM-PARENT."
+  (let ((distance 10))
+    (if (and (not (zerop (car direction-from-parent)))
+             (not (zerop (cdr direction-from-parent))))
+      (setf distance 14))
+    (make-instance 'node
+                   :parent parent-node
+                   :position (cons node-x node-y)
+                   :distance-from-parent distance)))
+
+(defun generate-node-cost (child current-node end-node)
+  "Calculates and sets the G, H, and F slots on child."
+  (with-slots (g h f position distance-from-parent) child
+    (setf g (+ distance-from-parent (node/g current-node))
+          h (+ (expt (- (car position) (car (node/position end-node))) 2)
+               (expt (- (cdr position) (cdr (node/position end-node))) 2))
+          f (+ g h))))
+
+(defun update-open-queue (open-list child-node)
+  "Updates an existing entry in OPEN-LIST if one exists that both matches CHILD-NODE, and
+has a larger G value. If there is no existing entry matching CHILD-NODE, then if pushes
+CHILD-NODE onto OPEN-LIST."
+  (let ((existing-child (find-in-queue open-list child-node)))
+    (cond ((and existing-child (< (node/g child-node) (node/g existing-child)))
+           (queues:queue-change open-list
+                                (queues:queue-find open-list existing-child)
+                                child-node))
+          (t
+           (queues:qpush open-list child-node)))))
+
+(defun generate-node-children (current-node map open-list closed-list end-node)
+  "Generates a list of all valid nodes that can be moved to from CURRENT-NODE,
+and adds them to OPEN-QUEUE. A valid node is one that is within the MAP dimensions,
+the tile is not blocking, and the node is not on CLOSED-LIST."
+  (dolist (new-position *all-directions*)
+    (let ((node-x (+ (car (node/position current-node))
+                     (car new-position)))
+          (node-y (+ (cdr (node/position current-node))
+                     (cdr (new-position)))))
+      (unless (or (> node-x (1- (game-map/w map)))
+                  (< node-x 0)
+                  (> node-y (1- (game-map/w map)))
+                  (< node-y 0))
+        (unless (tile/blocked (aref (game-map/tiles map) node-x node-y))
+          (let ((child (make-node current-node node-x node-y new-position)))
+            ;; child is on the closed list
+            (unless (find child closed-list :test 'node-equal)
+              (generate-node-cost child current-node end-node)
+              (update-open-queue open-list child))))))))
