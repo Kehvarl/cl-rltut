@@ -16,5 +16,6 @@
 	             (:file "fov")
                (:file "components")
                (:file "ai")
+               (:file "pathfinding")
 	             (:file "cl-rltut")
 	             ))
