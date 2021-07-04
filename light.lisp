@@ -14,18 +14,16 @@
       (dotimes (tile d)
        (let ((tx (round (lerp x nx (/ tile d))))
              (ty (round (lerp y ny (/ tile d)))))
-          (if (or (< tx 0) (> tx (game-map/w map)))
+          (if (or (< tx 0) (>= tx (game-map/w map)))
               (return))
-          (if (or (< ty 0) (> ty (game-map/h map)))
+          (if (or (< ty 0) (>= ty (game-map/h map)))
               (return))
 
     ;; if tile is a wall, stop the line early
          (when (tile/block-sight (aref (game-map/tiles map) tx ty))
                (setf (tile/light (aref (game-map/tiles map) tx ty))
-                     (+ (tile/light (aref (game-map/tiles map) tx ty))
-                        brightness))
+                     brightness)
                (return))
 
          (setf (tile/light (aref (game-map/tiles map) tx ty))
-               (+ (tile/light (aref (game-map/tiles map) tx ty))
-                  brightness)))))))
+               brightness))))))

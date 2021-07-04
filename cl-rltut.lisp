@@ -120,7 +120,7 @@
            (entities (list player))
            (map (make-instance 'game-map :w *map-width* :h *map-height*)))
       (make-map map
-                *max-rooms* *room-min-size* *room-max-size* 
+                *max-rooms* *room-min-size* *room-max-size*
                 *map-width* *map-height*
                 player entities *max-enemies-per-room*)
       (dolist (entity (remove-if-not #'entity/illuminating entities))

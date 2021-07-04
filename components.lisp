@@ -13,7 +13,7 @@
 
 (defclass illuminating (component)
   ((radius :initarg :radius :accessor illuminating/radius)
-   (brighness :initarg :brightness :accessor illuminating/brightness)))
+   (brightness :initarg :brightness :accessor illuminating/brightness)))
 
 
 (defgeneric illuminate (component map))
