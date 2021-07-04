@@ -11,7 +11,8 @@
    (h :initform 0 :accessor node/h)
    (f :initform 0 :accessor node/f)
    (distance-from-parent :initarg :distance-from-parent :accessor node/distance-from-parent)
-   (parent :initarg :position :initform nil :accessor node/position)))
+   (parent :initarg :parent :initform nil :accessor node/parent)
+   (position :initarg :position :initform nil :accessor node/position)))
 
 (defmethod print-object ((obj node) stream)
   (print-unreadable-object (obj stream :type t)
@@ -32,8 +33,8 @@ than n2's"
 with the same position, it will return the LAST one it finds."
   (let ((node nil))
     (queues:map-queue #'(lambda (item)
-                                (when (node-equal n item)
-                                  (setf node item)))
+                          (when (node-equal n item)
+                            (setf node item)))
                       queue)
     node))
 
@@ -73,21 +74,21 @@ CHILD-NODE onto OPEN-LIST."
            (queues:queue-change open-list
                                 (queues:queue-find open-list existing-child)
                                 child-node))
-          (t
-           (queues:qpush open-list child-node)))))
+      (t
+       (queues:qpush open-list child-node)))))
 
 (defun generate-node-children (current-node map open-list closed-list end-node)
   "Generates a list of all valid nodes that can be moved to from CURRENT-NODE,
-and adds them to OPEN-QUEUE. A valid node is one that is within the MAP dimensions,
-the tile is not blocking, and the node is not on CLOSED-LIST."
+    and adds them to OPEN-QUEUE. A valid node is one that is within the MAP dimensions,
+    the tile is not blocking, and the node is not on CLOSED-LIST."
   (dolist (new-position *all-directions*)
     (let ((node-x (+ (car (node/position current-node))
                      (car new-position)))
           (node-y (+ (cdr (node/position current-node))
-                     (cdr (new-position)))))
+                     (cdr new-position))))
       (unless (or (> node-x (1- (game-map/w map)))
                   (< node-x 0)
-                  (> node-y (1- (game-map/w map)))
+                  (> node-y (1- (game-map/h map)))
                   (< node-y 0))
         (unless (tile/blocked (aref (game-map/tiles map) node-x node-y))
           (let ((child (make-node current-node node-x node-y new-position)))
@@ -96,7 +97,7 @@ the tile is not blocking, and the node is not on CLOSED-LIST."
               (generate-node-cost child current-node end-node)
               (update-open-queue open-list child))))))))
 
-(defun astar (map start end)
+(defun astar (game-map start end)
   "Returns a list of cons cells as a path from the given start to the given
 end points in the given map"
   (let ((start-node (make-instance 'node :position start))
@@ -112,4 +113,4 @@ end points in the given map"
       (when (node-equal current-node end-node)
         (return-from astar (create-path current-node)))
 
-      (generate-node-children current-node map open-list closed-list end-node))))
+      (generate-node-children current-node game-map open-list closed-list end-node))))
