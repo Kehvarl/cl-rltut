@@ -2,17 +2,20 @@
 
 (defclass tile ()
   ((blocked :initarg :blocked
-      :accessor tile/blocked
-      :initform nil)
+            :accessor tile/blocked
+            :initform nil)
    (block-sight :initarg :block-sight
-    :accessor tile/block-sight
-    :initform nil)
+                :accessor tile/block-sight
+                :initform nil)
    (visible :initarg :visible
-      :accessor tile/visible
-      :initform nil)
+            :accessor tile/visible
+            :initform nil)
    (explored :initarg :explored
-       :accessor tile/explored
-       :initform nil)))
+             :accessor tile/explored
+             :initform nil)
+   (light :initarg :light
+          :accessor tile/light
+          :initform 0)))
 
 (defmethod initialize-instance :after ((tile tile) &rest initargs)
   (declare (ignore initargs))
@@ -20,7 +23,8 @@
     (if (null block-sight)
      (setf block-sight blocked))))
 
-(defmethod set-tile-slots ((tile tile) &key (blocked nil blocked-supplied-p) (block-sight nil block-sight-supplied-p))
+(defmethod set-tile-slots ((tile tile) &key (blocked nil blocked-supplied-p)
+                                       (block-sight nil block-sight-supplied-p))
   (if blocked-supplied-p
       (setf (slot-value tile 'blocked) blocked))
   (if block-sight-supplied-p

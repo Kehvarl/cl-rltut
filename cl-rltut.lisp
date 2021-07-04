@@ -69,6 +69,8 @@
 
 (defun game-tick (player entities map game-state)
   (declare (type game-states game-state))
+  (dolist (entity (remove-if-not #'entity/illuminating entities))
+    (illuminate (entity/illuminating entity) map))
   (render-all entities map)
   (let* ((action (handle-keys))
          (move (getf action :move))
@@ -98,17 +100,21 @@
   (blt:with-terminal
     (config)
     (let* ((fighter-component (make-instance 'fighter
-                               :hp 30
-                               :defense 2
-                               :attack 5))
+                                             :hp 30
+                                             :defense 2
+                                             :attack 5))
+           (light-component (make-instance 'illuminating
+                                           :radius 5
+                                           :brightness 1))
            (player (make-instance 'entity
-                    :name "Player"
-                    :x (/ *screen-width* 2)
-                    :y (/ *screen-height* 2)
-                    :char #\@
-                    :color (blt:white)
-                    :blocks t
-                    :fighter fighter-component))
+                                  :name "Player"
+                                  :x (/ *screen-width* 2)
+                                  :y (/ *screen-height* 2)
+                                  :char #\@
+                                  :color (blt:white)
+                                  :blocks t
+                                  :fighter fighter-component
+                                  :illuminating light-component))
            (entities (list player))
            (map (make-instance 'game-map :w *map-width* :h *map-height*)))
       (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player entities *max-enemies-per-room*)

@@ -9,15 +9,19 @@
    (color :initarg :color :accessor entity/color)
    (blocks :initarg :blocks :accessor entity/blocks)
    (fighter :initarg :fighter :accessor entity/fighter :initform nil)
-   (ai :initarg :ai :accessor entity/ai :initform nil)))
+   (ai :initarg :ai :accessor entity/ai :initform nil)
+   (illuminating :initarg :illuminating :accessor entity/illuminating :initform nil)))
+
 
 (defmethod initialize-instance :after ((entity entity) &rest initargs)
   (declare (ignore initargs))
-  (with-slots (fighter ai) entity
+  (with-slots (fighter ai illuminating) entity
     (when fighter
       (setf (component/owner fighter) entity))
     (when ai
-      (setf (component/owner ai) entity))))
+      (setf (component/owner ai) entity))
+    (when illuminating
+      (setf (component/owner illuminating) entity))))
 
 (defmethod move ((e entity) dx dy)
   (incf (entity/x e) dx)

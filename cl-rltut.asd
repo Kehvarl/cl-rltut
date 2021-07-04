@@ -17,5 +17,6 @@
                (:file "components")
                (:file "pathfinding")
                (:file "ai")
+               (:file "light")
 	             (:file "cl-rltut")
 	             ))

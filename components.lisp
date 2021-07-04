@@ -10,3 +10,17 @@
    (attack :initarg :attack :accessor fighter/attack)))
 
 (defgeneric take-turn (component target map entitites))
+
+(defclass illuminating (component)
+  ((radius :initarg :radius :accessor illuminating/radius)
+   (brighness :initarg :brightness :accessor illuminating/brightness)))
+
+
+(defgeneric illuminate (component map))
+
+(defmethod illuminate ((component illuminating) map)
+  (let ((source (component/owner component)))
+    (light map
+           (entity/x source)
+           (entity/y source)
+           1)))

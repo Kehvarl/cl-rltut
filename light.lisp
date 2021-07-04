@@ -1,14 +1,12 @@
 (in-package :cl-rltut)
 
-(defparameter *fov-distance* 50)
+(defparameter *fov-distance* 5)
 
-(defun reset-visibility (map)
+(defun reset-light (map)
   (map-tiles-loop (map tile)
-    (setf (tile/visible tile) nil)))
+    (setf (tile/light tile) 0)))
 
-(defun fov (map x y)
-  (reset-visibility map)
-
+(defun light (map x y brightness)
   ;; loop over 360 degrees
   (dotimes (degree 360)
     (let* ((rad (degree-to-radian degree))
@@ -21,14 +19,15 @@
           (if (or (< tx 0) (> tx (game-map/w map)))
               (return))
           (if (or (< ty 0) (> ty (game-map/h map)))
-              (return)))
+              (return))
 
-    ;; if tile is a wall, mark as seen and stop the line early
-       (when (> (tile/light (aref (game-map/tiles map) tx ty)) 0)
+    ;; if tile is a wall, stop the line early
          (when (tile/block-sight (aref (game-map/tiles map) tx ty))
-           (setf (tile/visible (aref (game-map/tiles map) tx ty)) t
-                 (tile/explored (aref (game-map/tiles map) tx ty)) t)
-           (return))
+               (setf (tile/light (aref (game-map/tiles map) tx ty))
+                     (+ (tile/light (aref (game-map/tiles map) tx ty))
+                        brightness))
+               (return))
 
-         (setf (tile/visible (aref (game-map/tiles map) tx ty)) t
-               (tile/explored (aref (game-map/tiles map) tx ty)) t))))))
+         (setf (tile/light (aref (game-map/tiles map) tx ty))
+               (+ (tile/light (aref (game-map/tiles map) tx ty))
+                  brightness)))))))
