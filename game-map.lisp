@@ -86,26 +86,35 @@
                                                           :hp 10
                                                           :defense 0
                                                           :attack 3))
+                        (light-component (make-instance 'illuminating
+                                                        :radius 5
+                                                        :brightness 1))
                         (ai-component (make-instance 'basic-monster))
                         (orc (make-instance 'entity
                                             :name "Orc"
                                             :x x :y y :color (blt:green)
                                             :char #\o :blocks t
                                             :fighter fighter-component
-                                            :ai ai-component)))
+                                            :ai ai-component
+                                            :illuminating light-component)))
                    (nconc entities (list orc))))
                 (t
                  (let* ((fighter-component (make-instance 'fighter
                                                           :hp 16
                                                           :defense 1
                                                           :attack 4))
+                        (light-component (make-instance 'illuminating
+                                                        :radius 5
+                                                        :brightness 1))
                         (ai-component (make-instance 'basic-monster))
                         (troll (make-instance 'entity
                                               :name "Troll"
                                               :x x :y y :color (blt:yellow)
                                               :char #\T :blocks t
                                               :fighter fighter-component
-                                              :ai ai-component)))
+                                              :ai ai-component
+                                              :illuminating light-component)))
+
                    (nconc entities (list troll))))))))))
 
 (defmethod make-map ((map game-map) max-rooms room-min-size room-max-size

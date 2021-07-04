@@ -1,17 +1,15 @@
 (in-package :cl-rltut)
 
-(defparameter *fov-distance* 5)
-
 (defun reset-light (map)
   (map-tiles-loop (map tile)
     (setf (tile/light tile) 0)))
 
-(defun light (map x y brightness)
+(defun light (map x y radius brightness)
   ;; loop over 360 degrees
   (dotimes (degree 360)
     (let* ((rad (degree-to-radian degree))
-           (nx (round (+ (* (cos rad) *fov-distance*) x)))
-           (ny (round (+ (* (sin rad) *fov-distance*) y)))
+           (nx (round (+ (* (cos rad) radius) x)))
+           (ny (round (+ (* (sin rad) radius) y)))
            (d (diagonal-distance x y nx ny)))
       (dotimes (tile d)
        (let ((tx (round (lerp x nx (/ tile d))))

@@ -1,6 +1,6 @@
 (in-package :cl-rltut)
 
-(defparameter *fov-distance* 50)
+(defparameter *fov-distance* 100)
 
 (defun reset-visibility (map)
   (map-tiles-loop (map tile)

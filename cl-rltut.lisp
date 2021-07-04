@@ -69,8 +69,10 @@
 
 (defun game-tick (player entities map game-state)
   (declare (type game-states game-state))
+
   (dolist (entity (remove-if-not #'entity/illuminating entities))
     (illuminate (entity/illuminating entity) map))
+
   (render-all entities map)
   (let* ((action (handle-keys))
          (move (getf action :move))
@@ -117,7 +119,12 @@
                                   :illuminating light-component))
            (entities (list player))
            (map (make-instance 'game-map :w *map-width* :h *map-height*)))
-      (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player entities *max-enemies-per-room*)
+      (make-map map
+                *max-rooms* *room-min-size* *room-max-size* 
+                *map-width* *map-height*
+                player entities *max-enemies-per-room*)
+      (dolist (entity (remove-if-not #'entity/illuminating entities))
+        (illuminate (entity/illuminating entity) map))
       (fov map (entity/x player) (entity/y player))
 
       (do ((game-state :player-turn (game-tick player entities map game-state)))

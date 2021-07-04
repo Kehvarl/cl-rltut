@@ -23,4 +23,5 @@
     (light map
            (entity/x source)
            (entity/y source)
-           1)))
+           (illuminating/radius component)
+           (illuminating/brightness component))))
